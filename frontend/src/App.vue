@@ -1,7 +1,9 @@
 <script setup lang="ts">
-// Ler Bíblia - Bible Reading Application
+import MainLayout from './components/MainLayout.vue';
 </script>
 
 <template>
-  <router-view />
+  <MainLayout>
+    <router-view />
+  </MainLayout>
 </template>
