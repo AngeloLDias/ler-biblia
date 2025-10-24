@@ -32,6 +32,14 @@ const loadChapter = async () => {
     const bookResponse = await axios.get(`${API_BASE_URL}/v1/bible/books/${bookId.value}`);
     bookName.value = bookResponse.data.name;
     totalChapters.value = bookResponse.data.chapters;
+
+    // Salvar última leitura no localStorage
+    localStorage.setItem('lastRead', JSON.stringify({
+      translationId: translationId.value,
+      bookId: bookId.value,
+      bookName: bookName.value,
+      chapter: chapter.value,
+    }));
   } catch (error) {
     console.error('Erro ao carregar capítulo:', error);
   } finally {
