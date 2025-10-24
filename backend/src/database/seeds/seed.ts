@@ -7,7 +7,7 @@ import { booksData } from './books.data';
 import { sampleVersesData, translationsData } from './sample-verses.data';
 
 const AppDataSource = new DataSource({
-  type: 'sqlite',
+  type: 'better-sqlite3',
   database: 'bible.db',
   entities: [Translation, Book, Verse, ReadingPlan],
   synchronize: true,

@@ -8,7 +8,7 @@ const reading_plan_entity_1 = require("../../features/bible/entities/reading-pla
 const books_data_1 = require("./books.data");
 const sample_verses_data_1 = require("./sample-verses.data");
 const AppDataSource = new typeorm_1.DataSource({
-    type: 'sqlite',
+    type: 'better-sqlite3',
     database: 'bible.db',
     entities: [translation_entity_1.Translation, book_entity_1.Book, verse_entity_1.Verse, reading_plan_entity_1.ReadingPlan],
     synchronize: true,

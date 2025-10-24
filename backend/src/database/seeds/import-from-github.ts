@@ -15,7 +15,7 @@ import axios from 'axios';
 const GITHUB_BASE = 'https://raw.githubusercontent.com/thiagobodruk/bible/master/json';
 
 const dataSource = new DataSource({
-  type: 'sqlite',
+  type: 'better-sqlite3',
   database: 'bible.db',
   entities: [Translation, Book, Verse],
   synchronize: false,

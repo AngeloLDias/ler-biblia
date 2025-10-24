@@ -7,7 +7,7 @@ const translation_entity_1 = require("../../features/bible/entities/translation.
 const axios_1 = require("axios");
 const GITHUB_BASE = 'https://raw.githubusercontent.com/thiagobodruk/bible/master/json';
 const dataSource = new typeorm_1.DataSource({
-    type: 'sqlite',
+    type: 'better-sqlite3',
     database: 'bible.db',
     entities: [translation_entity_1.Translation, book_entity_1.Book, verse_entity_1.Verse],
     synchronize: false,
