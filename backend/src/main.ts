@@ -7,15 +7,22 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   // Enable CORS for frontend
-  const allowedOrigins = [
-    'http://localhost:5173',
-    'http://localhost:3000',
-    'https://ler-biblia.vercel.app',
-    process.env.FRONTEND_URL,
-  ].filter(Boolean);
-
   app.enableCors({
-    origin: allowedOrigins,
+    origin: (origin, callback) => {
+      const allowedOrigins = [
+        'http://localhost:5173',
+        'http://localhost:3000',
+        'https://ler-biblia.vercel.app',
+        process.env.FRONTEND_URL,
+      ].filter(Boolean);
+
+      // Allow Vercel preview deployments
+      if (!origin || allowedOrigins.includes(origin) || origin.endsWith('.vercel.app')) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
     credentials: true,
   });
 
