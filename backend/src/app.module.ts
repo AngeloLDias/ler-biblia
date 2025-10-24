@@ -22,7 +22,7 @@ import { UserPreference } from './features/bible/entities/user-preference.entity
       isGlobal: true,
     }),
     TypeOrmModule.forRoot({
-      type: 'sqlite',
+      type: 'better-sqlite3',
       database: 'bible.db',
       entities: [
         Translation,

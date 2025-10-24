@@ -34,7 +34,7 @@ exports.AppModule = AppModule = __decorate([
                 isGlobal: true,
             }),
             typeorm_1.TypeOrmModule.forRoot({
-                type: 'sqlite',
+                type: 'better-sqlite3',
                 database: 'bible.db',
                 entities: [
                     translation_entity_1.Translation,
