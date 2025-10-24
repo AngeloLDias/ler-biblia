@@ -84,7 +84,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-base-100">
+  <div class="min-h-screen bg-base-100 overflow-x-hidden">
     <div class="container mx-auto p-4 max-w-4xl">
       <!-- Header -->
       <div class="flex items-center justify-between mb-6">
@@ -98,22 +98,22 @@ onMounted(() => {
       </div>
 
       <!-- Navigation -->
-      <div class="flex justify-between items-center mb-6">
+      <div class="flex justify-between items-center gap-2 mb-6">
         <button
           @click="previousChapter"
-          class="btn btn-outline btn-sm"
+          class="btn btn-outline btn-sm flex-shrink-0"
           :disabled="chapter <= 1"
         >
           ← Cap. {{ chapter - 1 }}
         </button>
 
-        <div class="text-center">
-          <p class="text-sm opacity-70">Capítulo {{ chapter }} de {{ totalChapters }}</p>
+        <div class="text-center flex-shrink min-w-0">
+          <p class="text-sm opacity-70 truncate">Capítulo {{ chapter }} de {{ totalChapters }}</p>
         </div>
 
         <button
           @click="nextChapter"
-          class="btn btn-outline btn-sm"
+          class="btn btn-outline btn-sm flex-shrink-0"
           :disabled="chapter >= totalChapters"
         >
           Cap. {{ chapter + 1 }} →
@@ -146,25 +146,28 @@ onMounted(() => {
       </div>
 
       <!-- Bottom Navigation -->
-      <div v-if="verses.length > 0" class="flex justify-between items-center mt-8 pt-6 border-t">
+      <div v-if="verses.length > 0" class="flex flex-col md:flex-row justify-between items-stretch md:items-center gap-3 mt-8 pt-6 border-t">
         <button
           @click="previousChapter"
-          class="btn btn-primary"
+          class="btn btn-primary btn-sm md:btn-md flex-1 md:flex-initial"
           :disabled="chapter <= 1"
         >
-          ← Capítulo Anterior
+          <span class="md:hidden">← Cap. Anterior</span>
+          <span class="hidden md:inline">← Capítulo Anterior</span>
         </button>
 
-        <button @click="goToSelector" class="btn btn-outline">
-          📚 Selecionar Outro
+        <button @click="goToSelector" class="btn btn-outline btn-sm md:btn-md flex-1 md:flex-initial">
+          <span class="md:hidden">📚 Outro</span>
+          <span class="hidden md:inline">📚 Selecionar Outro</span>
         </button>
 
         <button
           @click="nextChapter"
-          class="btn btn-primary"
+          class="btn btn-primary btn-sm md:btn-md flex-1 md:flex-initial"
           :disabled="chapter >= totalChapters"
         >
-          Próximo Capítulo →
+          <span class="md:hidden">Próximo Cap. →</span>
+          <span class="hidden md:inline">Próximo Capítulo →</span>
         </button>
       </div>
     </div>
