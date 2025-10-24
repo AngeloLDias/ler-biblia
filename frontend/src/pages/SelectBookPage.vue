@@ -2,6 +2,7 @@
 import { ref, onMounted, computed } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import axios from 'axios';
+import { API_BASE_URL } from '../config/api';
 
 const router = useRouter();
 const route = useRoute();
@@ -23,7 +24,7 @@ const translationId = Number(route.params.translationId);
 const loadBooks = async () => {
   loading.value = true;
   try {
-    const response = await axios.get('http://localhost:3000/v1/bible/books');
+    const response = await axios.get(`${API_BASE_URL}/v1/bible/books`);
     books.value = response.data;
   } catch (error) {
     console.error('Erro ao carregar livros:', error);

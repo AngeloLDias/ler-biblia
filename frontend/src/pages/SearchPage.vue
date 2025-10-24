@@ -2,6 +2,7 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import axios from 'axios';
+import { API_BASE_URL } from '../config/api';
 
 const router = useRouter();
 const searchQuery = ref('');
@@ -10,10 +11,10 @@ const loading = ref(false);
 
 const search = async () => {
   if (!searchQuery.value.trim()) return;
-  
+
   loading.value = true;
   try {
-    const response = await axios.get('http://localhost:3000/v1/search', {
+    const response = await axios.get(`${API_BASE_URL}/v1/search`, {
       params: { query: searchQuery.value },
     });
     results.value = response.data;

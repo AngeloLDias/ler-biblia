@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import axios from 'axios';
+import { API_BASE_URL } from '../config/api';
 
 const router = useRouter();
 const plans = ref<any[]>([]);
@@ -10,7 +11,7 @@ const loading = ref(false);
 const loadPlans = async () => {
   loading.value = true;
   try {
-    const response = await axios.get('http://localhost:3000/v1/plans');
+    const response = await axios.get(`${API_BASE_URL}/v1/plans`);
     plans.value = response.data;
   } catch (error) {
     console.error('Erro ao carregar planos:', error);

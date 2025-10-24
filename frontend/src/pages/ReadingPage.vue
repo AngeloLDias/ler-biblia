@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import axios from 'axios';
+import { API_BASE_URL } from '../config/api';
 
 const route = useRoute();
 const router = useRouter();
@@ -18,7 +19,7 @@ const chapter = ref(Number(route.params.chapter));
 const loadChapter = async () => {
   loading.value = true;
   try {
-    const response = await axios.get('http://localhost:3000/v1/bible/chapter', {
+    const response = await axios.get(`${API_BASE_URL}/v1/bible/chapter`, {
       params: {
         translationId: translationId.value,
         bookId: bookId.value,
@@ -28,7 +29,7 @@ const loadChapter = async () => {
     verses.value = response.data;
 
     // Buscar nome do livro e total de capítulos
-    const bookResponse = await axios.get(`http://localhost:3000/v1/bible/books/${bookId.value}`);
+    const bookResponse = await axios.get(`${API_BASE_URL}/v1/bible/books/${bookId.value}`);
     bookName.value = bookResponse.data.name;
     totalChapters.value = bookResponse.data.chapters;
   } catch (error) {
