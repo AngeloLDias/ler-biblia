@@ -34,8 +34,12 @@ exports.AppModule = AppModule = __decorate([
                 isGlobal: true,
             }),
             typeorm_1.TypeOrmModule.forRoot({
-                type: 'better-sqlite3',
-                database: 'bible.db',
+                type: 'postgres',
+                host: process.env.DB_HOST || 'localhost',
+                port: parseInt(process.env.DB_PORT || '5432', 10),
+                username: process.env.DB_USERNAME || 'postgres',
+                password: process.env.DB_PASSWORD || 'postgres',
+                database: process.env.DB_DATABASE || 'ler_biblia',
                 entities: [
                     translation_entity_1.Translation,
                     book_entity_1.Book,

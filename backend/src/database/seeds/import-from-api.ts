@@ -3,22 +3,29 @@ import { Verse } from '../../features/bible/entities/verse.entity';
 import { Book } from '../../features/bible/entities/book.entity';
 import { Translation } from '../../features/bible/entities/translation.entity';
 import axios from 'axios';
+import * as dotenv from 'dotenv';
+
+dotenv.config();
 
 /**
  * Script para importar a Bíblia completa da API Bíblia Digital
- * 
+ *
  * Como usar:
  * 1. Execute: npm run seed (para criar traduções e livros)
  * 2. Execute: npx ts-node src/database/seeds/import-from-api.ts nvi
- * 
+ *
  * Traduções disponíveis: nvi, acf, arc, aa
  */
 
 const API_BASE = 'https://www.abibliadigital.com.br/api';
 
 const dataSource = new DataSource({
-  type: 'sqlite',
-  database: 'bible.db',
+  type: 'postgres',
+  host: process.env.DB_HOST || 'localhost',
+  port: parseInt(process.env.DB_PORT || '5432', 10),
+  username: process.env.DB_USERNAME || 'postgres',
+  password: process.env.DB_PASSWORD || 'postgres',
+  database: process.env.DB_DATABASE || 'ler_biblia',
   entities: [Translation, Book, Verse],
   synchronize: false,
 });

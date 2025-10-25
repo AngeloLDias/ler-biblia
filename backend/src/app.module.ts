@@ -22,8 +22,12 @@ import { UserPreference } from './features/bible/entities/user-preference.entity
       isGlobal: true,
     }),
     TypeOrmModule.forRoot({
-      type: 'better-sqlite3',
-      database: 'bible.db',
+      type: 'postgres',
+      host: process.env.DB_HOST || 'localhost',
+      port: parseInt(process.env.DB_PORT || '5432', 10),
+      username: process.env.DB_USERNAME || 'postgres',
+      password: process.env.DB_PASSWORD || 'postgres',
+      database: process.env.DB_DATABASE || 'ler_biblia',
       entities: [
         Translation,
         Book,

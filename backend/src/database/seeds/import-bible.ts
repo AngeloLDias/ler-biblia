@@ -4,10 +4,13 @@ import { Book } from '../../features/bible/entities/book.entity';
 import { Translation } from '../../features/bible/entities/translation.entity';
 import * as fs from 'fs';
 import * as path from 'path';
+import * as dotenv from 'dotenv';
+
+dotenv.config();
 
 /**
  * Script para importar a Bíblia completa de um arquivo JSON
- * 
+ *
  * Formato esperado do JSON:
  * {
  *   "translation": "NVI",
@@ -26,7 +29,7 @@ import * as path from 'path';
  *     }
  *   ]
  * }
- * 
+ *
  * Como usar:
  * 1. Baixe o arquivo JSON da Bíblia
  * 2. Coloque em backend/src/database/seeds/data/
@@ -34,8 +37,12 @@ import * as path from 'path';
  */
 
 const dataSource = new DataSource({
-  type: 'sqlite',
-  database: 'bible.db',
+  type: 'postgres',
+  host: process.env.DB_HOST || 'localhost',
+  port: parseInt(process.env.DB_PORT || '5432', 10),
+  username: process.env.DB_USERNAME || 'postgres',
+  password: process.env.DB_PASSWORD || 'postgres',
+  database: process.env.DB_DATABASE || 'ler_biblia',
   entities: [Translation, Book, Verse],
   synchronize: false,
 });

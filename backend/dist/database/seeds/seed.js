@@ -7,9 +7,15 @@ const verse_entity_1 = require("../../features/bible/entities/verse.entity");
 const reading_plan_entity_1 = require("../../features/bible/entities/reading-plan.entity");
 const books_data_1 = require("./books.data");
 const sample_verses_data_1 = require("./sample-verses.data");
+const dotenv = require("dotenv");
+dotenv.config();
 const AppDataSource = new typeorm_1.DataSource({
-    type: 'better-sqlite3',
-    database: 'bible.db',
+    type: 'postgres',
+    host: process.env.DB_HOST || 'localhost',
+    port: parseInt(process.env.DB_PORT || '5432', 10),
+    username: process.env.DB_USERNAME || 'postgres',
+    password: process.env.DB_PASSWORD || 'postgres',
+    database: process.env.DB_DATABASE || 'ler_biblia',
     entities: [translation_entity_1.Translation, book_entity_1.Book, verse_entity_1.Verse, reading_plan_entity_1.ReadingPlan],
     synchronize: true,
 });
@@ -21,10 +27,7 @@ async function seed() {
         const bookRepo = AppDataSource.getRepository(book_entity_1.Book);
         const verseRepo = AppDataSource.getRepository(verse_entity_1.Verse);
         const planRepo = AppDataSource.getRepository(reading_plan_entity_1.ReadingPlan);
-        await verseRepo.clear();
-        await translationRepo.clear();
-        await bookRepo.clear();
-        await planRepo.clear();
+        await AppDataSource.query('TRUNCATE TABLE "verses", "translations", "books", "reading_plans" RESTART IDENTITY CASCADE');
         console.log('Seeding translations...');
         const translations = await translationRepo.save(sample_verses_data_1.translationsData);
         console.log(`✓ ${translations.length} translations seeded`);

@@ -5,10 +5,17 @@ import { Verse } from '../../features/bible/entities/verse.entity';
 import { ReadingPlan } from '../../features/bible/entities/reading-plan.entity';
 import { booksData } from './books.data';
 import { sampleVersesData, translationsData } from './sample-verses.data';
+import * as dotenv from 'dotenv';
+
+dotenv.config();
 
 const AppDataSource = new DataSource({
-  type: 'better-sqlite3',
-  database: 'bible.db',
+  type: 'postgres',
+  host: process.env.DB_HOST || 'localhost',
+  port: parseInt(process.env.DB_PORT || '5432', 10),
+  username: process.env.DB_USERNAME || 'postgres',
+  password: process.env.DB_PASSWORD || 'postgres',
+  database: process.env.DB_DATABASE || 'ler_biblia',
   entities: [Translation, Book, Verse, ReadingPlan],
   synchronize: true,
 });
@@ -23,11 +30,8 @@ async function seed() {
     const verseRepo = AppDataSource.getRepository(Verse);
     const planRepo = AppDataSource.getRepository(ReadingPlan);
 
-    // Clear existing data
-    await verseRepo.clear();
-    await translationRepo.clear();
-    await bookRepo.clear();
-    await planRepo.clear();
+    // Clear existing data (PostgreSQL requires CASCADE for foreign keys)
+    await AppDataSource.query('TRUNCATE TABLE "verses", "translations", "books", "reading_plans" RESTART IDENTITY CASCADE');
 
     console.log('Seeding translations...');
     const translations = await translationRepo.save(translationsData);

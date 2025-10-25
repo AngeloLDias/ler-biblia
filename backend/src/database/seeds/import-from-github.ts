@@ -3,11 +3,14 @@ import { Verse } from '../../features/bible/entities/verse.entity';
 import { Book } from '../../features/bible/entities/book.entity';
 import { Translation } from '../../features/bible/entities/translation.entity';
 import axios from 'axios';
+import * as dotenv from 'dotenv';
+
+dotenv.config();
 
 /**
  * Script para importar a Bíblia do repositório GitHub
  * Fonte: https://raw.githubusercontent.com/thiagobodruk/bible/master/json/
- * 
+ *
  * Como usar:
  * npx ts-node src/database/seeds/import-from-github.ts nvi
  */
@@ -15,25 +18,28 @@ import axios from 'axios';
 const GITHUB_BASE = 'https://raw.githubusercontent.com/thiagobodruk/bible/master/json';
 
 const dataSource = new DataSource({
-  type: 'better-sqlite3',
-  database: 'bible.db',
+  type: 'postgres',
+  host: process.env.DB_HOST || 'localhost',
+  port: parseInt(process.env.DB_PORT || '5432', 10),
+  username: process.env.DB_USERNAME || 'postgres',
+  password: process.env.DB_PASSWORD || 'postgres',
+  database: process.env.DB_DATABASE || 'ler_biblia',
   entities: [Translation, Book, Verse],
   synchronize: false,
 });
 
-// Mapeamento de abreviações para IDs dos livros
-// IMPORTANTE: Os IDs começam em 67 porque o seed criou os livros com esses IDs
-const BOOK_ABBREV_TO_ID: { [key: string]: number } = {
-  'gn': 67, 'ex': 68, 'lv': 69, 'nm': 70, 'dt': 71, 'js': 72, 'jz': 73, 'rt': 74,
-  '1sm': 75, '2sm': 76, '1rs': 77, '2rs': 78, '1cr': 79, '2cr': 80, 'ed': 81,
-  'ne': 82, 'et': 83, 'jó': 84, 'sl': 85, 'pv': 86, 'ec': 87, 'ct': 88,
-  'is': 89, 'jr': 90, 'lm': 91, 'ez': 92, 'dn': 93, 'os': 94, 'jl': 95,
-  'am': 96, 'ob': 97, 'jn': 98, 'mq': 99, 'na': 100, 'hc': 101, 'sf': 102,
-  'ag': 103, 'zc': 104, 'ml': 105, 'mt': 106, 'mc': 107, 'lc': 108, 'jo': 109,
-  'at': 110, 'rm': 111, '1co': 112, '2co': 113, 'gl': 114, 'ef': 115, 'fp': 116,
-  'cl': 117, '1ts': 118, '2ts': 119, '1tm': 120, '2tm': 121, 'tt': 122, 'fm': 123,
-  'hb': 124, 'tg': 125, '1pe': 126, '2pe': 127, '1jo': 128, '2jo': 129, '3jo': 130,
-  'jd': 131, 'ap': 132,
+// Mapeamento de abreviações do GitHub para abreviações do nosso banco
+const GITHUB_ABBREV_TO_DB_ABBREV: { [key: string]: string } = {
+  'gn': 'Gn', 'ex': 'Êx', 'lv': 'Lv', 'nm': 'Nm', 'dt': 'Dt', 'js': 'Js', 'jz': 'Jz', 'rt': 'Rt',
+  '1sm': '1Sm', '2sm': '2Sm', '1rs': '1Rs', '2rs': '2Rs', '1cr': '1Cr', '2cr': '2Cr', 'ed': 'Ed',
+  'ne': 'Ne', 'et': 'Et', 'jó': 'Jó', 'sl': 'Sl', 'pv': 'Pv', 'ec': 'Ec', 'ct': 'Ct',
+  'is': 'Is', 'jr': 'Jr', 'lm': 'Lm', 'ez': 'Ez', 'dn': 'Dn', 'os': 'Os', 'jl': 'Jl',
+  'am': 'Am', 'ob': 'Ob', 'jn': 'Jn', 'mq': 'Mq', 'na': 'Na', 'hc': 'Hc', 'sf': 'Sf',
+  'ag': 'Ag', 'zc': 'Zc', 'ml': 'Ml', 'mt': 'Mt', 'mc': 'Mc', 'lc': 'Lc', 'jo': 'Jo',
+  'atos': 'At', 'at': 'At', 'rm': 'Rm', '1co': '1Co', '2co': '2Co', 'gl': 'Gl', 'ef': 'Ef', 'fp': 'Fp',
+  'cl': 'Cl', '1ts': '1Ts', '2ts': '2Ts', '1tm': '1Tm', '2tm': '2Tm', 'tt': 'Tt', 'fm': 'Fm',
+  'hb': 'Hb', 'tg': 'Tg', '1pe': '1Pe', '2pe': '2Pe', '1jo': '1Jo', '2jo': '2Jo', '3jo': '3Jo',
+  'jd': 'Jd', 'ap': 'Ap',
 };
 
 const TRANSLATION_MAP: { [key: string]: string } = {
@@ -80,21 +86,30 @@ async function importBibleFromGitHub(translationCode: string) {
     const batchSize = 1000;
     let verseBatch: any[] = [];
 
+    // Buscar todos os livros do banco para mapear por abreviação
+    const allBooks = await bookRepo.find();
+    const booksByAbbrev: { [key: string]: Book } = {};
+    allBooks.forEach(book => {
+      booksByAbbrev[book.abbreviation] = book;
+    });
+
     // Processar cada livro
     for (const bookData of bibleData) {
-      const abbrev = bookData.abbrev?.toLowerCase() || '';
-      const bookId = BOOK_ABBREV_TO_ID[abbrev];
+      const githubAbbrev = bookData.abbrev?.toLowerCase() || '';
+      const dbAbbrev = GITHUB_ABBREV_TO_DB_ABBREV[githubAbbrev];
 
-      if (!bookId) {
-        console.log(`⚠️  Livro não mapeado: abreviação '${abbrev}'`);
+      if (!dbAbbrev) {
+        console.log(`⚠️  Livro não mapeado: abreviação GitHub '${githubAbbrev}'`);
         continue;
       }
 
-      // Buscar nome do livro no banco
-      const book = await bookRepo.findOne({ where: { id: bookId } });
-      const bookName = book?.name || `Livro ${bookId}`;
+      const book = booksByAbbrev[dbAbbrev];
+      if (!book) {
+        console.log(`⚠️  Livro não encontrado no banco: '${dbAbbrev}'`);
+        continue;
+      }
 
-      console.log(`📖 Importando: ${bookName} (${bookData.chapters.length} capítulos)`);
+      console.log(`📖 Importando: ${book.name} (${bookData.chapters.length} capítulos)`);
 
       // Processar cada capítulo
       for (let chapterIndex = 0; chapterIndex < bookData.chapters.length; chapterIndex++) {
@@ -108,7 +123,7 @@ async function importBibleFromGitHub(translationCode: string) {
 
           verseBatch.push({
             translationId: translation.id,
-            bookId: bookId,
+            bookId: book.id,
             chapter: chapterNumber,
             verse: verseNumber,
             text: verseText,

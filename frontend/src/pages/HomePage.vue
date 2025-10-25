@@ -29,22 +29,23 @@ const fetchVerseOfDay = async () => {
     const dayOfYear = Math.floor(diff / oneDay);
 
     // Lista de versículos populares (bookId, chapter, verse)
+    // IDs corretos do PostgreSQL (1-66)
     const popularVerses = [
-      { bookId: 109, chapter: 3, verse: 16, ref: 'João 3:16' }, // João 3:16
-      { bookId: 88, chapter: 8, verse: 28, ref: 'Romanos 8:28' }, // Romanos 8:28
-      { bookId: 94, chapter: 4, verse: 13, ref: 'Filipenses 4:13' }, // Filipenses 4:13
-      { bookId: 67, chapter: 1, verse: 1, ref: 'Gênesis 1:1' }, // Gênesis 1:1
-      { bookId: 88, chapter: 12, verse: 2, ref: 'Romanos 12:2' }, // Romanos 12:2
-      { bookId: 90, chapter: 13, verse: 4, ref: '1 Coríntios 13:4' }, // 1 Coríntios 13:4
-      { bookId: 107, chapter: 1, verse: 9, ref: '1 João 1:9' }, // 1 João 1:9
-      { bookId: 86, chapter: 5, verse: 8, ref: 'Mateus 5:8' }, // Mateus 5:8
+      { bookId: 43, chapter: 3, verse: 16, ref: 'João 3:16' }, // João 3:16
+      { bookId: 45, chapter: 8, verse: 28, ref: 'Romanos 8:28' }, // Romanos 8:28
+      { bookId: 50, chapter: 4, verse: 13, ref: 'Filipenses 4:13' }, // Filipenses 4:13
+      { bookId: 1, chapter: 1, verse: 1, ref: 'Gênesis 1:1' }, // Gênesis 1:1
+      { bookId: 45, chapter: 12, verse: 2, ref: 'Romanos 12:2' }, // Romanos 12:2
+      { bookId: 46, chapter: 13, verse: 4, ref: '1 Coríntios 13:4' }, // 1 Coríntios 13:4
+      { bookId: 62, chapter: 1, verse: 9, ref: '1 João 1:9' }, // 1 João 1:9
+      { bookId: 40, chapter: 5, verse: 8, ref: 'Mateus 5:8' }, // Mateus 5:8
     ];
 
     const selectedVerse = popularVerses[dayOfYear % popularVerses.length];
 
     const response = await axios.get(`${API_BASE_URL}/v1/bible/verse`, {
       params: {
-        translationId: 3, // NVI
+        translationId: 1, // NVI
         bookId: selectedVerse.bookId,
         chapter: selectedVerse.chapter,
         verse: selectedVerse.verse,
@@ -101,8 +102,8 @@ const goToReading = () => {
       },
     });
   } else {
-    // Padrão: João 3
-    router.push({ name: 'read', params: { translationId: 3, bookId: 109, chapter: 3 } });
+    // Padrão: João 3 (bookId correto: 43, translationId correto: 1)
+    router.push({ name: 'read', params: { translationId: 1, bookId: 43, chapter: 3 } });
   }
 };
 
@@ -127,7 +128,7 @@ const goToVerseOfDay = () => {
     router.push({
       name: 'read',
       params: {
-        translationId: 3,
+        translationId: 1, // NVI (ID correto)
         bookId: verseOfDay.value.bookId,
         chapter: verseOfDay.value.chapter,
       },

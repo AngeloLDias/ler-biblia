@@ -6,9 +6,15 @@ const book_entity_1 = require("../../features/bible/entities/book.entity");
 const translation_entity_1 = require("../../features/bible/entities/translation.entity");
 const fs = require("fs");
 const path = require("path");
+const dotenv = require("dotenv");
+dotenv.config();
 const dataSource = new typeorm_1.DataSource({
-    type: 'sqlite',
-    database: 'bible.db',
+    type: 'postgres',
+    host: process.env.DB_HOST || 'localhost',
+    port: parseInt(process.env.DB_PORT || '5432', 10),
+    username: process.env.DB_USERNAME || 'postgres',
+    password: process.env.DB_PASSWORD || 'postgres',
+    database: process.env.DB_DATABASE || 'ler_biblia',
     entities: [translation_entity_1.Translation, book_entity_1.Book, verse_entity_1.Verse],
     synchronize: false,
 });

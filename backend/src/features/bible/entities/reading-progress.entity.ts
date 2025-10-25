@@ -14,7 +14,7 @@ export class ReadingProgress {
   @Column({ default: false })
   completed: boolean;
 
-  @Column({ type: 'datetime', nullable: true })
+  @Column({ type: 'timestamp', nullable: true })
   completedAt: Date | null;
 
   @Column({ nullable: true })

@@ -37,6 +37,41 @@ let BibleController = class BibleController {
     async getVerse(translationId, bookId, chapter, verse) {
         return this.bibleService.getVerse(translationId, bookId, chapter, verse);
     }
+    async getInfo() {
+        const translations = await this.bibleService.getTranslations();
+        const books = await this.bibleService.getBooks();
+        return {
+            message: 'Ler Bíblia API - Informações de IDs Disponíveis',
+            translations: translations.map(t => ({
+                id: t.id,
+                code: t.code,
+                name: t.name,
+                language: t.language,
+                hasVerses: t.id === 1,
+            })),
+            books: books.map(b => ({
+                id: b.id,
+                name: b.name,
+                abbreviation: b.abbreviation,
+                order: b.order,
+                testament: b.testament,
+            })),
+            examples: {
+                getTranslations: 'GET /v1/bible/translations',
+                getBooks: 'GET /v1/bible/books',
+                getChapter: 'GET /v1/bible/chapter?translationId=1&bookId=1&chapter=1',
+                getVerse: 'GET /v1/bible/verse?translationId=1&bookId=1&chapter=1&verse=1',
+                getInfo: 'GET /v1/bible/info',
+            },
+            notes: [
+                '⚠️ translationId: Use 1 para NVI (única tradução com versículos importados)',
+                '⚠️ bookId: Use valores de 1 a 66 (veja lista "books" acima)',
+                '💡 Exemplo: Oséias = bookId 28 (não 94!)',
+                '💡 Gênesis = bookId 1',
+                '💡 João = bookId 43',
+            ],
+        };
+    }
 };
 exports.BibleController = BibleController;
 __decorate([
@@ -86,6 +121,14 @@ __decorate([
     __metadata("design:paramtypes", [Number, Number, Number, Number]),
     __metadata("design:returntype", Promise)
 ], BibleController.prototype, "getVerse", null);
+__decorate([
+    (0, common_1.Get)('info'),
+    (0, swagger_1.ApiOperation)({ summary: 'Get API information and available IDs' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Returns API info with all available translations and books' }),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], BibleController.prototype, "getInfo", null);
 exports.BibleController = BibleController = __decorate([
     (0, swagger_1.ApiTags)('bible'),
     (0, common_1.Controller)('v1/bible'),
